@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:chat_app/constants/constants.dart';
 import 'package:chat_app/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
@@ -23,7 +24,24 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     initSocket();
 
+    setUpSocketListeners();
     super.initState();
+  }
+
+  setUpSocketListeners() {
+    socket.on('joined', (data) {
+      // Navigator.push(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+      Get.to(const HomeScreen());
+    });
+
+    socket.on('join-error', (data) {
+      Get.snackbar(
+        'Cannot Join!',
+        "${data['message']}",
+        duration: const Duration(seconds: 6),
+        backgroundColor: Colors.white,
+      );
+    });
   }
 
   initSocket() {
@@ -49,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Colors.deepPurple[100],
         body: SizedBox(
           height: double.infinity,
           child: Form(
@@ -175,9 +193,16 @@ class _LoginScreenState extends State<LoginScreen> {
     Future.delayed(const Duration(seconds: 3), () {
       Navigator.of(context).pop();
 
-      socket.emit('join', {'room': room.text, 'username': username.text});
-      Navigator.push(
-          context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+      if (socket.connected) {
+        socket.emit('join', {'room': room.text, 'username': username.text});
+      } else {
+        Get.snackbar(
+          'No connection',
+          "Couldn't connect to the server",
+          duration: const Duration(seconds: 6),
+          backgroundColor: Colors.white,
+        );
+      }
     });
   }
 }
