@@ -17,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController messageInput = TextEditingController();
   late IO.Socket socket;
-  ChatController chats = ChatController();
+  ChatController chats = Get.find<ChatController>();
 
   @override
   void initState() {
