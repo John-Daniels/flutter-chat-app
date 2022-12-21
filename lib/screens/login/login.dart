@@ -1,11 +1,11 @@
 import 'dart:ui';
 
-import 'package:chat_app/constants/constants.dart';
+import 'package:chat_app/controllers/socket_controller.dart';
 import 'package:chat_app/screens/home/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,15 +15,16 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  late IO.Socket socket;
+  // late IO.Socket socket;
+  final socketController = Get.find<SocketController>();
+  Socket get socket => socketController.socket;
+
   final GlobalKey<FormState> _globalKey = GlobalKey();
   final TextEditingController username = TextEditingController();
   final TextEditingController room = TextEditingController();
 
   @override
   void initState() {
-    initSocket();
-
     setUpSocketListeners();
     super.initState();
   }
@@ -42,25 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Colors.white,
       );
     });
-  }
-
-  initSocket() {
-    try {
-      socket = IO.io(socketUri, <String, dynamic>{
-        'transports': ['websocket'],
-        'autoConnect': true,
-      });
-
-      print('trying connnection');
-      socket.connect();
-
-      socket.onConnect((data) {
-        print('Connect: ${socket.id}');
-      });
-    } catch (e) {
-      print('error');
-      print(e.toString());
-    }
   }
 
   @override

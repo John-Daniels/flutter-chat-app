@@ -1,7 +1,13 @@
 var socketUri = 'http://localhost:5000';
 
+//'http://flutter-chat-app.onrender.com/';
 
-// 'http://192.168.0.126:5000';// -my own
+var socketSettings = <String, dynamic>{
+  'transports': ['websocket'],
+  'autoConnect': true,
+};
+
+// 'http://localhost:5000'; 'http://192.168.0.126:5000';// -my own
 
 // 'http://flutter-chat-app.onrender.com/';
 

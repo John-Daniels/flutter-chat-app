@@ -1,11 +1,10 @@
-import 'package:chat_app/constants/constants.dart';
 import 'package:chat_app/controllers/chat_controller.dart';
+import 'package:chat_app/controllers/socket_controller.dart';
 import 'package:chat_app/models/message.dart';
 import 'package:chat_app/screens/home/components/chat_blob.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,16 +14,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  TextEditingController messageInput = TextEditingController();
-  late IO.Socket socket;
+  final socketController = Get.find<SocketController>();
+  get socket => socketController.socket;
+
   ChatController chats = Get.find<ChatController>();
+
+  TextEditingController messageInput = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
-    super.initState();
-
-    initSocket();
     setUpSocketListeners();
+
+    super.initState();
   }
 
   @override
@@ -32,25 +34,6 @@ class _HomeScreenState extends State<HomeScreen> {
     socket.emit('logout');
 
     super.dispose();
-  }
-
-  initSocket() {
-    try {
-      socket = IO.io(socketUri, <String, dynamic>{
-        'transports': ['websocket'],
-        'autoConnect': true,
-      });
-
-      print('trying connnection');
-      socket.connect();
-
-      socket.onConnect((data) {
-        print('Connect: ${socket.id}');
-      });
-    } catch (e) {
-      print('error');
-      print(e.toString());
-    }
   }
 
   setUpSocketListeners() {
@@ -68,6 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
     socket.on('message-recieve', (data) {
       chats.chatMessages.add(Message.fromJson(data));
+
+      scrollDown();
     });
 
     socket.on('typeing', (data) {
@@ -121,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Obx(
                   () => ListView.builder(
+                    controller: _scrollController,
                     physics: const BouncingScrollPhysics(),
                     itemCount: chats.chatMessages.length,
                     itemBuilder: (context, index) {
@@ -146,7 +132,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: TextField(
                       onChanged: (value) {
-                        if (value.isEmpty) return socket.emit('type', false);
+                        if (value.isEmpty) {
+                          return socket.emit('type', false);
+                        }
                         socket.emit('type', true);
                       },
                       cursorColor: Colors.purple,
@@ -198,5 +186,23 @@ class _HomeScreenState extends State<HomeScreen> {
     var newMsg = chats.generateMessage(text);
     chats.chatMessages.add(Message.fromJson(newMsg));
     socket.emit('message', newMsg);
+
+    scrollDown();
+  }
+
+  void scrollDown() {
+    var inputOffset = Get.height * 0.8;
+    var scrollOffset = _scrollController.offset;
+
+    // print(inputOffset);
+    // print(_scrollController.offset);
+    // print(_scrollController.position.);
+
+    // if (scrollOffset >= inputOffset) {
+    _scrollController.jumpTo(
+      _scrollController.position.maxScrollExtent +
+          _scrollController.position.maxScrollExtent * 0.5,
+    );
+    // }
   }
 }
