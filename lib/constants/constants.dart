@@ -1,4 +1,4 @@
-var socketUri = 'http://flutter-chat-app.onrender.com/';
+var socketUri = 'https://flutter-chat-app.onrender.com/';
 
 // 'http://localhost:5000';
 
