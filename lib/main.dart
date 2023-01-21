@@ -1,4 +1,5 @@
 import 'package:chat_app/bindings/initial_bindings.dart';
+import 'package:chat_app/routes/router.dart';
 import 'package:chat_app/screens/login/login.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -17,7 +18,8 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: "Chat app",
       theme: ThemeData(primarySwatch: Colors.deepPurple),
-      home: const LoginScreen(),
+      initialRoute: LoginScreen.routeName,
+      getPages: AppRoutes.routes,
     );
   }
 }

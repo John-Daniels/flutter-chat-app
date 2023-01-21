@@ -10,6 +10,8 @@ import 'package:socket_io_client/socket_io_client.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
+  static String routeName = '/login';
+
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }

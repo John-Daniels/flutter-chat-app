@@ -9,6 +9,8 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
+  static String routeName = '/home';
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
